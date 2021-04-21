@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package j_and_c;
+
+// Timestamp
+message TimeStamp {
+    int32 h = 1;
+    int32 m = 2;
+    int32 s = 3;
+    int32 ms = 4;
+}
+
+// Enum fuer Sensordaten
+enum Sensor {
+    GPS = 0;
+    US = 1;
+    INFRARED = 4;
+    LIDAR = 8;    
+}
+
+// Message für Sensordaten
+message Sensors {
+    int32 id = 1;
+    TimeStamp timestamp = 2;
+    Sensor sensortype = 3;
+    string sensorvalue = 4;
+}
+
+// Eigentliche Message //
+message Status {
+    int32 id = 1;
+    TimeStamp timestamp = 2;
+    repeated Sensors sensordata = 3;
+}
