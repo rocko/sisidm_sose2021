@@ -1,0 +1,95 @@
+	var map = L.map('map', {minZoom: 0, maxZoom: 18, zoomSnap: 0, zoomDelta: 0.25}).setView([0, 0], 0);
+
+	// Eventhandler on map
+	map.on("contextmenu", function (event) {
+		draw_area(event);
+		update_flights();
+	});
+
+	L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png').addTo(map);
+
+	
+	// Global Variables
+	var trackingArea = null; // Tracking area marked by circle
+	var flight_layergroup = null;
+	var flight_data;
+	
+	// Icons
+	var plane_flying = L.icon({iconUrl: 'plane_fly.PNG',iconSize: [43, 45],iconAnchor: [21, 22]});
+	var plane_grounded = L.icon({iconUrl: 'plane_grounded.PNG', iconSize: [43, 45], iconAnchor: [21, 22]});
+	
+	// Request
+	var myHeaders = new Headers();
+	myHeaders.append("Authorization", "Basic Y2thOlN0b25lZDEyMzQs");
+	myHeaders.append("Cookie", "XSRF-TOKEN=6541dea4-0434-4d10-b6cd-12c7af32a8df");
+
+	var requestOptions = { method: 'GET', headers: myHeaders, redirect: 'follow'};
+	
+	// Add reference marker for Ostfalia
+	L.marker([52.178928, 10.559365]).addTo(map).bindTooltip("<b>Ostfalia</b>",{permanent: true, direction: 'right', opacity: 0.6});
+	
+	function clear_flights() {
+		flight_layergroup.removeFrom(map);	
+	}
+	
+	function update_flights() {
+		setInterval( () => { draw_flights()}, 2500);
+	}
+		
+	function draw_flights() {
+		let flight_data = get_data();
+		
+		Promise.all([flight_data]).then(flight_data => {
+			var tracked_flights = [];
+		
+			var marker, callsign, lat, lon;		
+			for (i = 0; i < flight_data[0].states.length; i++) {
+				callsign = flight_data[0].states[i][1];
+				latitude = flight_data[0].states[i][6];
+				longitude = flight_data[0].states[i][5];
+				true_track = flight_data[0].states[i][10];
+				on_ground = flight_data[0].states[i][8];
+				// Create marker only for flying aircraft
+				if (!on_ground) {
+					//marker = L.marker([latitude, longitude], {icon: plane_grounded,rotationAngle: true_track}).bindTooltip(callsign,{permanent: true, direction: 'right', opacity: 0.8});			
+				//} else {
+					marker = L.marker([latitude, longitude], {icon: plane_flying,rotationAngle: true_track}).bindTooltip(callsign,{permanent: true,direction: 'right',opacity: 0.8});			
+				}
+				tracked_flights[i] = marker; // Add flight to array
+			}		
+			
+			if (flight_layergroup == null) { // layergroup already exists
+				flight_layergroup = L.layerGroup(tracked_flights).addTo(map); // Create new layergroup
+			} else {
+				clear_flights(); // Delete old layergroup
+				flight_layergroup = L.layerGroup(tracked_flights).addTo(map);// Create new layergroup
+			}
+		});
+	}
+
+	function draw_area(event) {
+		if (flight_layergroup != null) { clear_flights() }
+		
+		var lat, lng;
+		lat = event.latlng.lat;
+		lng = event.latlng.lng;
+		
+		if (trackingArea == null) {
+			trackingArea = L.circle([lat, lng], {color: 'red',stroke: false,fillColor: '#f03',fillOpacity: 0.05,radius: 400000}).addTo(map);
+		} else {
+			trackingArea.setLatLng([lat, lng]);
+		}
+	}
+	
+	function get_data() {
+		var lamin = trackingArea.getBounds()._southWest.lat;
+		var lamax = trackingArea.getBounds()._northEast.lat;
+		var lomin = trackingArea.getBounds()._southWest.lng;
+		var lomax = trackingArea.getBounds()._northEast.lng;
+		var rest_all_states = 'https://opensky-network.org/api/states/all?lamin=' + lamin + '&lomin=' + lomin +'&lamax=' + lamax + '&lomax=' + lomax;
+		
+		return fetch(rest_all_states, requestOptions).then(async response => {
+			var flight_data = await response.json();
+			return flight_data;
+		})
+	}
