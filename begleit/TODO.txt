@@ -1,0 +1,46 @@
+Erstellen	 Sie	in	 2er-Gruppen	 eine	 Architekturdokumentation	 ein	 selbstfahrendes	Auto(Projekt Apollo	Auto von	Baidu, https://github.com/ApolloAuto/apollo,	Version	5.5).
+
+
+Bitte	orientieren	Sie	sich	am	Arc42-Template	und	beschreiben	Sie	insbesondere	die	folgenden	Punkte	ausführlich:
+
+
+Systemkontext
+ 
+Externe	Schnittstellen	mit den	darüber	kommunizierten	Daten	und	Szenarien
+
+Hardware-Struktur
+
+Elemente
+
+Internen	Schnittstellen	mit	den	darüber	kommunizierten	Daten	und	Szenarien
+
+Dokumentierte	und	vermutete	Anforderungen	und	Randbedingungen
+
+Lösungsstrategie
+
+Übergreifende	Konzepte (insbesondere,	aber	nicht	nur	in	common,	guardian	und drive)
+
+Bemerkenswerte	Architekturentscheidungen
+
+
+
+Beschränken	Sie	sich	bei	der	2.	Ebene	auf	einen ausgewählten	Baustein.
+
+Verwenden	Sie	als	Quellen	neben	der	Dokumentation	im	Github-Archiv	auch	den	Source	Code	(sowohl	.proto	als	auch	.cpp/.h).
+
+
+Die	Architekturdokumentation	muss	auf	dem	Arc42-Template	(https://arc42.org/)	basieren,	sich	an	den Anforderungen	an	eine	Architektur-Dokumentation	aus	der	Veranstaltung orientieren	und	für	eine	agile	Entwicklung	geeignet	sein. Letzteres	erreichen	Sie,	indem	 Sie	 gemäß	 dem	 Prinzip	 docs-as-code	 die	 docToolchain	 (https://github.com/docToolchain/docToolchain)	auf	einem	Continuous	Integration	Server	verwenden. Bitte	binden	Sie	mindestens	eine	mit	DrawIo	sowie	mindestens	eine	inline	mit	PlantUML	erstellte	
+Grafik	ein.
+
+Bitte	verwenden	Sie	als	Server	Github	oder	zum	Beispiel	den	GitLab-Server	der	Arbeitsgruppe	(nextlab-i,	Accounts	bei	phi.koehler@ostfalia.de).
+
+Bitte	beschreiben	Sie	im	Anhang	des	erstellten	Dokumentes	kurz	 Ihre	Erfahrungen	mit	
+(a)	Apollo,	
+(b)	Arc42 und	
+(c)	der	docToolchain	als	CI-Task.
+
+
+Die	Abgabe	erfolgt	
+• als	Link	auf	das	Repository	(muss	für	c.fuehner	lesbar	sein!),	
+• als	Link	auf	die	generierte	HTML-Dokumentation	und	
+• als	generierte	.pdf-Datei in	Moodle.
