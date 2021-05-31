@@ -1,17 +1,29 @@
-# Setup gradle
-gradlew.bat ausführen
+# Handbuch (offiziell)
+https://doctoolchain.github.io/docToolchain/
 
-# Initialisieren
+# doctoolchain klonen
+git clone --recursive https://github.com/docToolchain/docToolchain.git <Zielverzeichnis>
+
+# ins doctoolchain Zielverzeichnis wechseln
+
+## Setup gradle
+Ausführen: gradlew.bat
+
+## gradle.properties
+Ändern: inputPath = ./src
+
+## Initialisieren des ARC42 Templates
 
 -PnewDocDir=<absolute_path_to_root_dir_where_documentation_is_located> ... e.g E:\Studium\MASTER\SS2021\Softwareintensive_Systeme_in_der_Mobilität\repository\sisidm_2021\begleit
 
 gradlew -b init.gradle initArc42DE -PnewDocDir=E:\Studium\MASTER\SS2021\Softwareintensive_Systeme_in_der_Mobilität\repository\sisidm_2021\begleit
 
+# Ausgaben
 
-# HTML generieren
+## HTML generieren
 doctoolchain.bat E:\Studium\MASTER\SS2021\Softwareintensive_Systeme_in_der_Mobilität\repository\sisidm_2021\begleit generateHTML
 
-# PDF generieren
+## PDF generieren
 doctoolchain.bat E:\Studium\MASTER\SS2021\Softwareintensive_Systeme_in_der_Mobilität\repository\sisidm_2021\begleit generatePDF
 
 
