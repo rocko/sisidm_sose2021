@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package j_and_c;
+
+// Timestamp
+// see https://users.pja.edu.pl/~jms/qnx/help/watcom/clibref/qnx/clock_gettime.html
+//The clock_gettime() function gets the current time of the clock specified by clock_id, and puts it into the buffer pointed to by tp. The only supported clock ID is CLOCK_REALTIME.
+//The tp parameter points to a structure containing at least the following members:
+//time_t tv_sec
+//The number of seconds since 1970.
+//time_t tv_nsec
+//The number of nanoseconds expired in the current second. This value increases by some multiple of nanoseconds, based on the system clock's resolution.
+
+
+// The greeting service definition.
+service GetTime {
+  // Sends a greeting
+  rpc GimmeTime (TimeRequest) returns (TimeResponse) {}
+}
+  
+// The request message containing the user's name.
+message TimeRequest {
+  string req = 1;
+}
+  
+// The response message containing the greetings
+message TimeResponse {
+  double time_received = 1; // This part of the message is the time when the request was received
+  double time_sent = 2;     // This part of the message is the time when the reply was sent back
+  // The difference between these two TimeStamps is the timespan I for Cristian algorithm
+}
