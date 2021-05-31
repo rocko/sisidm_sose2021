@@ -1,4 +1,8 @@
+[![Gradle test](https://github.com/rocko/sisidm_sose2021/actions/workflows/main.yml/badge.svg)](https://github.com/rocko/sisidm_sose2021/actions/workflows/main.yml)
+
 [![docToolChain](https://github.com/rocko/sisidm_sose2021/actions/workflows/docToolChain.yml/badge.svg)](https://github.com/rocko/sisidm_sose2021/actions/workflows/docToolChain.yml)
+
+
 
 # Handbuch (offiziell)
 https://doctoolchain.github.io/docToolchain/
