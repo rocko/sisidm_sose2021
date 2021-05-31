@@ -1,3 +1,5 @@
+[![runOnGitHub](https://github.com/rocko/sisidm_sose2021/actions/workflows/runOnGitHub.yml/badge.svg)](https://github.com/rocko/sisidm_sose2021/actions/workflows/runOnGitHub.yml)
+
 # Handbuch (offiziell)
 https://doctoolchain.github.io/docToolchain/
 
@@ -28,3 +30,5 @@ doctoolchain.bat E:\Studium\MASTER\SS2021\Softwareintensive_Systeme_in_der_Mobil
 
 
 # CI
+
+
