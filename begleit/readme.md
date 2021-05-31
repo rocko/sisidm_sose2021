@@ -1,4 +1,4 @@
-[![runOnGitHub](https://github.com/rocko/sisidm_sose2021/actions/workflows/runOnGitHub.yml/badge.svg)](https://github.com/rocko/sisidm_sose2021/actions/workflows/runOnGitHub.yml)
+[![docToolChain](https://github.com/rocko/sisidm_sose2021/actions/workflows/docToolChain.yml/badge.svg)](https://github.com/rocko/sisidm_sose2021/actions/workflows/docToolChain.yml)
 
 # Handbuch (offiziell)
 https://doctoolchain.github.io/docToolchain/
