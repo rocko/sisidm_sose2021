@@ -24,12 +24,16 @@
 <script>
 
 
-	var map = L.map('map', {minZoom: 0, maxZoom: 18, zoomSnap: 0, zoomDelta: 0.25}).setView([0, 0], 0);
+	var map = L.map('map', {minZoom: 0, maxZoom: 18, zoomSnap: 0, zoomDelta: 0.25, center: [39.73, -104.99],})
+	map.setView([0, 0], 0);
 
 	// Eventhandler on map
 	map.on("contextmenu", function (event) {
 		draw_area(event);
 		update_flights();
+		
+		console.log("LAT orig: " + event.latlng.lat + " fixed: " + norm(event.latlng.lat, 85));
+		console.log("LNG orig: " + event.latlng.lng + " fixed: " + norm(event.latlng.lng, 180));
 	});
 
 	L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png').addTo(map);
@@ -38,9 +42,10 @@
 	// Global Variables
 	var trackingArea = null; // Tracking area marked by circle
 	var flight_layergroup = null;
+	var ground_layergroup = null;
 	var flight_data;
 	
-	var show_grounded = false;
+	var show_grounded = true;
 	
 	// Icons
 	var plane_flying = L.icon({iconUrl: 'img/plane_fly.PNG', iconSize: [43, 45], iconAnchor: [21, 22]});
@@ -55,22 +60,35 @@
 	
 	// Add reference marker for Ostfalia
 	L.marker([52.178928, 10.559365]).addTo(map).bindTooltip("<b>Ostfalia</b>", {permanent: true, direction: 'right', opacity: 0.6});
+	// Map limits
+	L.rectangle([[54.559322, -5.767822], [56.1210604, -3.021240]], {color: "#ff7800", weight: 1}).addTo(map);
+	
+	function norm(lat_or_lng, max) {
+		if (lat_or_lng > max || lat_or_lng < -max) {
+			lat_or_lng = (lat_or_lng + max) % 360 - max;
+		}
+		return lat_or_lng;
+	}
 	
 	function clear_flights() {
 		if (flight_layergroup != null) {
 			flight_layergroup.removeFrom(map);	
 		}
+		if (ground_layergroup != null) {
+			ground_layergroup.removeFrom(map);	
+		}
 	}
 	
 	function update_flights() {
-		setInterval( () => { draw_flights()}, 2500);
+		setInterval( () => { draw_flights()}, 5000);
 	}
 		
 	function draw_flights() {
 		let flight_data = get_data();
 		
 		Promise.all([flight_data]).then(flight_data => {
-			var tracked_flights = [];
+			var tracked_flying = [];
+			var tracked_grounded = [];
 		
 			var marker, callsign, lat, lon;		
 			for (i = 0; i < flight_data[0].states.length; i++) {
@@ -80,18 +98,16 @@
 				true_track = flight_data[0].states[i][10];
 				on_ground = flight_data[0].states[i][8];
 				// Create marker only for flying aircraft
-				if (!on_ground && show_grounded) {
-					//marker = L.marker([latitude, longitude], {icon: plane_grounded,rotationAngle: true_track}).bindTooltip(callsign,{permanent: true, direction: 'right', opacity: 0.8});			
-				//} else {
-					marker = L.marker([latitude, longitude], {icon: plane_flying, rotationAngle: true_track}).bindTooltip(callsign,{permanent: true, direction: 'right', opacity: 0.8});			
+				if (on_ground && show_grounded) {
+					tracked_grounded.push(L.marker([latitude, longitude], {icon: plane_grounded,rotationAngle: true_track}).bindTooltip(callsign,{permanent: true, direction: 'right', opacity: 0.8}));	
+				} else {
+					tracked_flying.push(L.marker([latitude, longitude], {icon: plane_flying, rotationAngle: true_track}).bindTooltip(callsign,{permanent: true, direction: 'right', opacity: 0.8}));
 				}
-				tracked_flights[i] = marker; // Add flight to array
 			}		
 			
-			if (flight_layergroup != null) { // layergroup already exists
-				clear_flights(); // Delete old layergroup
-			} 
-			flight_layergroup = L.layerGroup(tracked_flights).addTo(map);// Create new layergroup
+			clear_flights(); // Delete old layergroup
+			flight_layergroup = L.layerGroup(tracked_flying).addTo(map);// Create new layergroup
+			ground_layergroup = L.layerGroup(tracked_grounded).addTo(map);// Create new layergroup
 		});
 	}
 
@@ -99,8 +115,10 @@
 		if (flight_layergroup != null) { clear_flights() }
 		
 		var lat, lng;
-		lat = event.latlng.lat;
-		lng = event.latlng.lng;
+		lat = norm(event.latlng.lat, 90);
+		lng = norm(event.latlng.lng, 180);
+		
+
 		
 		if (trackingArea == null) {
 			trackingArea = L.circle([lat, lng], {color: 'red', stroke: false, fillColor: '#f03', fillOpacity: 0.05, radius: 400000}).addTo(map);
@@ -114,6 +132,10 @@
 		var lamax = trackingArea.getBounds()._northEast.lat;
 		var lomin = trackingArea.getBounds()._southWest.lng;
 		var lomax = trackingArea.getBounds()._northEast.lng;
+		
+
+		console.log( 'https://opensky-network.org/api/states/all?lamin=' + lamin + '&lomin=' + lomin +'&lamax=' + lamax + '&lomax=' + lomax);	
+		
 		var rest_all_states = 'https://opensky-network.org/api/states/all?lamin=' + lamin + '&lomin=' + lomin +'&lamax=' + lamax + '&lomax=' + lomax;
 		
 		return fetch(rest_all_states, requestOptions).then(async response => {
