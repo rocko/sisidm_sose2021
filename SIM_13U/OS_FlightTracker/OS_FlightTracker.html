@@ -11,8 +11,8 @@
 			margin: 0;
 		}
 		#map {
-			width: 1200px;
-			height: 500px;
+			width: 90%;
+			height: 800px;
 		}
 	</style>
 	
@@ -24,8 +24,13 @@
 <script>
 
 
-	var map = L.map('map', {minZoom: 0, maxZoom: 18, zoomSnap: 0, zoomDelta: 0.25, center: [39.73, -104.99],})
+	var map = L.map('map', {minZoom: 3, maxZoom: 11, zoomSnap: 0, zoomDelta: 0.5, center: [39.73, -104.99],})
 	map.setView([0, 0], 0);
+
+	map.fitBounds([
+		[90, -180],
+		[-90, 180]
+	]);
 
 	// Eventhandler on map
 	map.on("contextmenu", function (event) {
@@ -36,7 +41,30 @@
 		console.log("LNG orig: " + event.latlng.lng + " fixed: " + norm(event.latlng.lng, 180));
 	});
 
-	L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png').addTo(map);
+	// Show grounded flights checkbox
+	var grounded_cb = L.control({position: 'topright'});
+	
+	grounded_cb.onAdd = function(map) {
+		var div = L.DomUtil.create('div', 'grounded_cb');
+		div.innerHTML = '<form><input id="grounded_cb" type="checkbox"/>Show grounded planes</form>';
+		return div;
+	}
+
+	var radius_slider = L.control({position: 'topright'});
+	
+	radius_slider.onAdd = function(map) {
+		var div = L.DomUtil.create('div', 'grounded_cb');
+		div.innerHTML = '<form><input type="range" min="10000" max="500000" value="400000" class="slider" id="radius_slider">Radius</form>';
+		return div;
+	}
+
+	grounded_cb.addTo(map);
+	document.getElementById ("grounded_cb").addEventListener ("click", show_grounded, false);
+	
+	radius_slider.addTo(map);
+	document.getElementById ("radius_slider").addEventListener ("change", set_radius, false);	
+	
+	L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {noWrap: true}).addTo(map);
 
 	
 	// Global Variables
@@ -45,7 +73,7 @@
 	var ground_layergroup = null;
 	var flight_data;
 	
-	var show_grounded = true;
+	var show_grounded = false;
 	
 	// Icons
 	var plane_flying = L.icon({iconUrl: 'img/plane_fly.PNG', iconSize: [43, 45], iconAnchor: [21, 22]});
@@ -60,9 +88,23 @@
 	
 	// Add reference marker for Ostfalia
 	L.marker([52.178928, 10.559365]).addTo(map).bindTooltip("<b>Ostfalia</b>", {permanent: true, direction: 'right', opacity: 0.6});
-	// Map limits
-	L.rectangle([[54.559322, -5.767822], [56.1210604, -3.021240]], {color: "#ff7800", weight: 1}).addTo(map);
+
+	function show_grounded() {
+		if (!show_grounded) {
+			show_grounded = true;
+		} else {
+			show_grounded = false;
+		}
+	}
 	
+	function set_radius() {
+		if (trackingArea != null) {
+			trackingArea.setRadius(document.getElementById("radius_slider").value);
+			console.log(document.getElementById("radius_slider").value);
+		}
+	}
+		
+
 	function norm(lat_or_lng, max) {
 		if (lat_or_lng > max || lat_or_lng < -max) {
 			lat_or_lng = (lat_or_lng + max) % 360 - max;
@@ -82,7 +124,7 @@
 	function update_flights() {
 		setInterval( () => { draw_flights()}, 5000);
 	}
-		
+	
 	function draw_flights() {
 		let flight_data = get_data();
 		
